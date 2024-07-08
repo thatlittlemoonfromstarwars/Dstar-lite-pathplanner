@@ -2,6 +2,8 @@ import pygame
 import time
 from grid import OccupancyGridMap
 from typing import List
+import csv
+import datetime
 
 # Define some colors
 BLACK = (0, 0, 0)  # BLACK
@@ -11,6 +13,8 @@ START = (255, 0, 0)  # RED
 GRAY1 = (145, 145, 102)  # GRAY1
 OBSTACLE = (77, 77, 51)  # GRAY2
 LOCAL_GRID = (0, 0, 80)  # BLUE
+
+FILE_SAVE_PATH = '/home/wmm/sim_ws/src/Dstar-lite-pathplanner/maps/'
 
 colors = {
     0: UNOCCUPIED,
@@ -107,6 +111,16 @@ class Animation:
                                                       (self.margin + self.height) * o[0] + self.margin,
                                                       self.width,
                                                       self.height])
+    def save_grid_to_csv(self, matrix):
+        # Get current date and time to use as file name
+        time_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        file_name = FILE_SAVE_PATH + time_string + ".csv"
+        matrix = matrix.astype(int)
+
+        with open(file_name, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for row in matrix:
+                writer.writerow(row)
 
     def run_game(self, path=None):
         if path is None:
@@ -132,6 +146,9 @@ class Animation:
                     self.cont = True
                 else:
                     self.cont = False
+
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                self.save_grid_to_csv(self.world.get_map())
 
             # set obstacle by holding left-click
             elif pygame.mouse.get_pressed()[0]:

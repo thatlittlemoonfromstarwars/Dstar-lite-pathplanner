@@ -1,9 +1,13 @@
 from gui import Animation
 from d_star_lite import DStarLite
 from grid import OccupancyGridMap, SLAM
+import csv
+import numpy as np
 
 OBSTACLE = 255
 UNOCCUPIED = 0
+
+LOAD_FILE_PATH = '/home/wmm/sim_ws/src/Dstar-lite-pathplanner/maps/20240708-114328.csv'
 
 if __name__ == '__main__':
 
@@ -15,8 +19,8 @@ if __name__ == '__main__':
     V (x=2, y=0)
     x, row
     """
-    x_dim = 100
-    y_dim = 80
+    x_dim = 80
+    y_dim = 100
     start = (10, 10)
     goal = (40, 70)
     view_range = 5
@@ -30,6 +34,15 @@ if __name__ == '__main__':
                     start=start,
                     goal=goal,
                     viewing_range=view_range)
+
+    # Load prexisting world from CSV
+    
+    
+    # read csv file to matrix
+    with open(LOAD_FILE_PATH, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        matrix = np.array([list(map(int, row)) for row in reader])
+    gui.world.set_map(matrix)
 
     new_map = gui.world
     old_map = new_map
