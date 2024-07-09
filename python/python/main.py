@@ -7,7 +7,7 @@ import numpy as np
 OBSTACLE = 255
 UNOCCUPIED = 0
 
-LOAD_FILE_PATH = None
+LOAD_FILE_PATH = 'Dstar-lite-pathplanner/maps/maze.csv'
 
 if __name__ == '__main__':
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     x_dim = 100
     y_dim = 150
     start = (10, 10)
-    goal = (70, 120)
+    goal = (11, 11)
     view_range = 10
 
     gui = Animation(title="D* Lite Path Planning",
@@ -45,7 +45,6 @@ if __name__ == '__main__':
             gui.world.set_map(matrix)
         except:
             print("Unable to open file. Continuing with empty map.")
-
 
     new_goal = gui.goal
     old_goal = new_goal

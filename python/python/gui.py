@@ -12,7 +12,7 @@ GRAY1 = (145, 145, 102)  # GRAY1
 OBSTACLE = (77, 77, 51)  # GRAY2
 LOCAL_GRID = (0, 0, 80)  # BLUE
 
-FILE_SAVE_PATH = 'Dstar-lite-pathplanner\maps\\'
+FILE_SAVE_PATH = 'Dstar-lite-pathplanner/maps/'
 
 colors = {
     0: UNOCCUPIED,
