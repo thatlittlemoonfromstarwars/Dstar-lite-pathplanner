@@ -1,7 +1,5 @@
 import pygame
-import time
 from grid import OccupancyGridMap
-from typing import List
 import csv
 import datetime
 
@@ -121,6 +119,8 @@ class Animation:
             writer = csv.writer(csvfile)
             for row in matrix:
                 writer.writerow(row)
+        
+        print("Map saved.")
 
     def run_game(self, path=None):
         if path is None:

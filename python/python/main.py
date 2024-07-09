@@ -70,7 +70,6 @@ if __name__ == '__main__':
 
     while not gui.done:
         # update the map
-        # print(path)
         # drive gui
         gui.run_game(path=path)
 
@@ -78,14 +77,6 @@ if __name__ == '__main__':
         new_observation = gui.observation
         new_map = gui.world
         new_goal = gui.goal
-
-        """
-        if new_observation is not None:
-            if new_observation["type"] == OBSTACLE:
-                dstar.global_map.set_obstacle(pos=new_observation["pos"])
-            if new_observation["pos"] == UNOCCUPIED:
-                dstar.global_map.remove_obstacle(pos=new_observation["pos"])
-        """
 
         if new_observation is not None:
             old_map = new_map
