@@ -7,7 +7,7 @@ import numpy as np
 OBSTACLE = 255
 UNOCCUPIED = 0
 
-LOAD_FILE_PATH = '/home/wmm/sim_ws/src/Dstar-lite-pathplanner/maps/20240708-114328.csv'
+LOAD_FILE_PATH = None
 
 if __name__ == '__main__':
 
@@ -19,11 +19,11 @@ if __name__ == '__main__':
     V (x=2, y=0)
     x, row
     """
-    x_dim = 80
-    y_dim = 100
+    x_dim = 100
+    y_dim = 150
     start = (10, 10)
-    goal = (40, 70)
-    view_range = 5
+    goal = (70, 120)
+    view_range = 10
 
     gui = Animation(title="D* Lite Path Planning",
                     width=10,
@@ -39,10 +39,14 @@ if __name__ == '__main__':
     
     
     # read csv file to matrix
-    with open(LOAD_FILE_PATH, 'r') as csvfile:
-        reader = csv.reader(csvfile)
-        matrix = np.array([list(map(int, row)) for row in reader])
-    gui.world.set_map(matrix)
+    if LOAD_FILE_PATH is not None:
+        try:
+            with open(LOAD_FILE_PATH, 'r') as csvfile:
+                reader = csv.reader(csvfile)
+                matrix = np.array([list(map(int, row)) for row in reader])
+            gui.world.set_map(matrix)
+        except:
+            print("Unable to open file. Continuing with empty map.")
 
     new_map = gui.world
     old_map = new_map
