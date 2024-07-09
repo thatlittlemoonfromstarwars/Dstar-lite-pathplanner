@@ -36,11 +36,9 @@ if __name__ == '__main__':
                     viewing_range=view_range)
 
     # Load prexisting world from CSV
-    
-    
-    # read csv file to matrix
     if LOAD_FILE_PATH is not None:
         try:
+            # read csv file to matrix
             with open(LOAD_FILE_PATH, 'r') as csvfile:
                 reader = csv.reader(csvfile)
                 matrix = np.array([list(map(int, row)) for row in reader])
@@ -48,14 +46,15 @@ if __name__ == '__main__':
         except:
             print("Unable to open file. Continuing with empty map.")
 
+
+    new_goal = gui.goal
+    old_goal = new_goal
+
     new_map = gui.world
     old_map = new_map
 
     new_position = start
     last_position = start
-
-    # new_observation = None
-    # type = OBSTACLE
 
     # D* Lite (optimized)
     dstar = DStarLite(map=new_map,
@@ -78,6 +77,7 @@ if __name__ == '__main__':
         new_position = gui.current
         new_observation = gui.observation
         new_map = gui.world
+        new_goal = gui.goal
 
         """
         if new_observation is not None:
@@ -102,3 +102,25 @@ if __name__ == '__main__':
 
             # d star
             path, g, rhs = dstar.move_and_replan(robot_position=new_position)
+
+        if new_goal != old_goal:
+            old_goal = new_goal
+            start = gui.current
+
+            new_map = gui.world
+            old_map = new_map
+
+            new_position = start
+            last_position = start
+
+            # D* Lite (optimized)
+            dstar = DStarLite(map=new_map,
+                            s_start=start,
+                            s_goal=new_goal)
+
+            # SLAM to detect vertices
+            slam = SLAM(map=new_map,
+                        view_range=view_range)
+
+            # move and compute path
+            path, g, rhs = dstar.move_and_replan(robot_position=gui.current)

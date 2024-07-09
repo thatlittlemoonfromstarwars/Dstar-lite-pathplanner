@@ -14,7 +14,7 @@ GRAY1 = (145, 145, 102)  # GRAY1
 OBSTACLE = (77, 77, 51)  # GRAY2
 LOCAL_GRID = (0, 0, 80)  # BLUE
 
-FILE_SAVE_PATH = '/home/wmm/sim_ws/src/Dstar-lite-pathplanner/maps/'
+FILE_SAVE_PATH = 'Dstar-lite-pathplanner\maps\\'
 
 colors = {
     0: UNOCCUPIED,
@@ -149,6 +149,36 @@ class Animation:
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 self.save_grid_to_csv(self.world.get_map())
+
+            # set new start by shift-clicking
+            elif pygame.mouse.get_pressed()[0] and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                # User clicks the mouse. Get the position
+                (col, row) = pygame.mouse.get_pos()
+
+                # change the x/y screen coordinates to grid coordinates
+                x = row // (self.height + self.margin)
+                y = col // (self.width + self.margin)
+
+                # turn pos into cell
+                grid_cell = (x, y)
+                
+                # change start position
+                self.current = grid_cell
+
+            # set new goal by ctrl-clicking
+            elif pygame.mouse.get_pressed()[0] and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                # User clicks the mouse. Get the position
+                (col, row) = pygame.mouse.get_pos()
+
+                # change the x/y screen coordinates to grid coordinates
+                x = row // (self.height + self.margin)
+                y = col // (self.width + self.margin)
+
+                # turn pos into cell
+                grid_cell = (x, y)
+                
+                # change start position
+                self.goal = grid_cell
 
             # set obstacle by holding left-click
             elif pygame.mouse.get_pressed()[0]:
