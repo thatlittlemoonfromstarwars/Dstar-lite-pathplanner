@@ -1,6 +1,7 @@
 from gui import Animation
 from d_star_lite import DStarLite
 from grid import OccupancyGridMap, SLAM
+from post_process_path import plan_adjusted_path
 import csv
 import numpy as np
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     x_dim = 100
     y_dim = 150
     start = (10, 10)
-    goal = (11, 11)
+    goal = (60, 90)
     view_range = 10
 
     gui = Animation(title="D* Lite Path Planning",
@@ -68,10 +69,13 @@ if __name__ == '__main__':
     # move and compute path
     path, g, rhs = dstar.move_and_replan(robot_position=new_position)
 
+    # post process path
+    path_adjusted = plan_adjusted_path(path, gui.world, gui.current, gui.goal)
+
     while not gui.done:
         # update the map
         # drive gui
-        gui.run_game(path=path)
+        gui.run_game(path=path, path_adjusted=path_adjusted)
 
         new_position = gui.current
         new_observation = gui.observation
@@ -95,7 +99,7 @@ if __name__ == '__main__':
             path, g, rhs = dstar.move_and_replan(robot_position=new_position)
 
             # altered path
-            # new_path = plan_altered_path(path, gui.world, gui.current, gui.goal)
+            path_adjusted = plan_adjusted_path(path, gui.world, gui.current, gui.goal)
 
         if new_goal != old_goal:
             old_goal = new_goal
@@ -118,3 +122,6 @@ if __name__ == '__main__':
 
             # move and compute path
             path, g, rhs = dstar.move_and_replan(robot_position=gui.current)
+
+            # post process path
+            path_adjusted = plan_adjusted_path(path, gui.world, gui.current, gui.goal)

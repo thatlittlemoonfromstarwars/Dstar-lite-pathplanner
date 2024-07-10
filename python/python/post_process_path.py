@@ -2,7 +2,7 @@
 import numpy as np
 
 # processing function
-def plan_altered_path(path, world_map, robot_pos, goal_pos):
+def plan_adjusted_path(path, world_map, robot_pos, goal_pos):
     '''
     Inputs:
     path - list of (x,y) coordinates - path planned by unaltered D* Lite algorithm
@@ -27,7 +27,8 @@ def plan_altered_path(path, world_map, robot_pos, goal_pos):
     altered_path = [] # list of coordinates representing the new path
 
     ############################################# ALTERATION CODE GOES HERE #############################################
-
+    for x, y in path:
+        altered_path.append((x-1, y+1))
 
     #####################################################################################################################
 

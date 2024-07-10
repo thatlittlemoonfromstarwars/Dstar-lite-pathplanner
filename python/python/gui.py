@@ -1,14 +1,21 @@
+from numpy import empty
 import pygame
 from grid import OccupancyGridMap
 import csv
 import datetime
 
+# Constants
+DISPLAY_UNCHANGED_PATH = True
+FOLLOW_UNCHANGED_PATH = True
+
 # Define some colors
 BLACK = (0, 0, 0)  # BLACK
 UNOCCUPIED = (255, 255, 255)  # WHITE EDF2F4
-# UNOCCUPIED = (141, 153, 174) # 8D99AE
 GOAL = (0, 255, 0)  # GREEN
-START = (217, 4, 41)  # RED D90429
+ROBOT = BLACK
+# PATH = (8, 126, 139) # TEAL 087E8B
+PATH = (217, 4, 41)  # FIRE ENGINE RED D90429
+PATH_ADJUSTED = (141, 0, 23) # CARMINE 8D0017
 GRAY1 = (145, 145, 102)  # GRAY1
 OBSTACLE = (59, 44, 53)  # GRAY2 3B2C35
 LOCAL_GRID = (0, 0, 80)  # BLUE
@@ -93,7 +100,7 @@ class Animation:
     def set_start(self, start: (int, int)):
         self.start = start
 
-    def display_path(self, path=None):
+    def display_path(self, path=None, colour=PATH):
         if path is not None:
             for step in path:
                 # draw a moving robot, based on current coordinates
@@ -101,7 +108,7 @@ class Animation:
                                round(step[0] * (self.height + self.margin) + self.height / 2) + self.margin]
 
                 # draw robot position as red circle
-                pygame.draw.circle(self.screen, START, step_center, round(self.width / 2) - 2)
+                pygame.draw.circle(self.screen, colour, step_center, round(self.width / 2) - 2)
 
     def display_obs(self, observations=None):
         if observations is not None:
@@ -123,9 +130,12 @@ class Animation:
         
         print("Map saved.")
 
-    def run_game(self, path=None):
+    def run_game(self, path=None, path_adjusted=None):
         if path is None:
             path = []
+
+        if path_adjusted is None:
+            path_adjusted = []
 
         grid_cell = None
         self.cont = False
@@ -137,8 +147,18 @@ class Animation:
 
             elif (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or self.cont:
                 # space bar pressed. call next action
-                if path:
-                    (x, y) = path[1]
+
+                # check if at goal
+                if len(path_adjusted) == 1 or len(path) == 1:
+                    self.done = True
+
+                # move to next path position
+                elif path_adjusted:
+                    if FOLLOW_UNCHANGED_PATH:
+                        (x, y) = path[1]
+                    else:
+                        (x, y) = path_adjusted[1]
+
                     self.set_position((x, y))
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
@@ -230,7 +250,11 @@ class Animation:
                                   self.width,
                                   self.height])
 
-        self.display_path(path=path)
+        # display both path and adjusted path
+        if DISPLAY_UNCHANGED_PATH:
+            self.display_path(path=path, colour=PATH)
+        self.display_path(path=path_adjusted, colour=PATH_ADJUSTED)
+
         # fill in the goal cell with green
         pygame.draw.rect(self.screen, GOAL, [(self.margin + self.width) * self.goal[1] + self.margin,
                                              (self.margin + self.height) * self.goal[0] + self.margin,
@@ -243,7 +267,7 @@ class Animation:
                             self.current[0] * (self.height + self.margin) + self.height / 2) + self.margin]
 
         # draw robot position as red circle
-        pygame.draw.circle(self.screen, START, robot_center, round(self.width / 2) - 2)
+        pygame.draw.circle(self.screen, ROBOT, robot_center, round(self.width / 2) - 2)
 
         # draw robot local grid map (viewing range)
         pygame.draw.rect(self.screen, LOCAL_GRID,

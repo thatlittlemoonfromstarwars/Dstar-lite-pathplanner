@@ -16,6 +16,8 @@
 
 This software is an implementation of the D*-Lite algorithm as explained in [Koenig, 2002](http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf). The D* Lite algorithm was developed by Sven Koenig and Maxim Likhachev for a faster more lightweight alternative to the D* algorithm (developed by Anthony Stentz in 1995). 
 
+It's functionality has been extended to support dynamic robot and goal placement, as well as map saving and loading by Andor Siegers.
+
 ## Dependencies
 * pip install pygame
 * pip install numpy
@@ -34,18 +36,22 @@ $ python main.py
 * [Space] - move robot along line
 * [left click] - place obstacle
 * [right click] - remove obstacle
+* [shift + left click] - change robot position
+* [ctrl + left click] - change goal position
+* [s] - save map
 * s_start, s_goal and view range can be changed in main.py
 
 ### The cell colors are as follows:
 * Red - shortest path
+* Dark Red - altered path
+* Black - robot position
 * Green - goal vertex
-* grey - obstacle
-* white - unoccupied
+* Grey - obstacle
+* White - unoccupied
 
-### idea
+### Idea
 
-
-The version of D* Lite that I implemented works by bascially running A* search in reverse starting from the goal and attempting to work back to the start. The solver then gives out the current solution and waits for some kind of change in the weights or obstacles that it is presented with. As opposed to repeated A* search, the D* Lite algorithm avoids replanning from scratch and incrementally repair path keeping its modifications local around robot pose.
+The version of D* Lite that I implemented works by bascially running A* search in reverse starting from the goal and attempting to work back to the start. The solver then gives out the current solution and waits for some kind of change in the weights or obstacles that it is presented with. As opposed to repeated A* search, the D* Lite algorithm avoids replanning from scratch and incrementally repairs the path keeping, its modifications local around robot pose.
 
 This is the optimized version as explained in Figure 4 of the paper.
 
