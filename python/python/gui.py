@@ -150,6 +150,7 @@ class Animation:
 
                 # check if at goal
                 if len(path_adjusted) == 1 or len(path) == 1:
+                    print("Goal reached!")
                     self.done = True
 
                 # move to next path position
