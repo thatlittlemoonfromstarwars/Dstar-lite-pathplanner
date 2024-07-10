@@ -192,6 +192,7 @@ class Animation:
                 # turn pos into cell
                 grid_cell = (x, y)
 
+
                 # set the location in the grid map
                 if self.world.is_unoccupied(grid_cell):
                     self.world.set_obstacle(grid_cell)
