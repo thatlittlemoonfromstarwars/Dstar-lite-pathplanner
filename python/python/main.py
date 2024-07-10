@@ -8,7 +8,7 @@ import numpy as np
 OBSTACLE = 255
 UNOCCUPIED = 0
 
-LOAD_FILE_PATH = 'Dstar-lite-pathplanner\maps\lab_filled_in.csv'
+LOAD_FILE_PATH = 'Dstar-lite-pathplanner/maps/lab_filled_in.csv'
 # LOAD_FILE_PATH = None
 
 if __name__ == '__main__':
@@ -77,10 +77,10 @@ if __name__ == '__main__':
         # drive gui
         gui.run_game(path=path, path_adjusted=path_adjusted)
 
-        new_position = gui.current
+        new_position = gui.current # contains robot location
         new_observation = gui.observation
-        new_map = gui.world
-        new_goal = gui.goal
+        new_map = gui.world # contains map matrix (255 for obstacle, 0 for free space)
+        new_goal = gui.goal # contains goal location
 
         if new_observation is not None:
             old_map = new_map
@@ -96,7 +96,7 @@ if __name__ == '__main__':
             dstar.sensed_map = slam_map
 
             # d star
-            path, g, rhs = dstar.move_and_replan(robot_position=new_position)
+            path, g, rhs = dstar.move_and_replan(robot_position=new_position) # path holds the list of coordinates in the path
 
             # altered path
             path_adjusted = plan_adjusted_path(path, gui.world, gui.current, gui.goal)
