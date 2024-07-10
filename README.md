@@ -16,7 +16,7 @@
 
 This software is an implementation of the D*-Lite algorithm as explained in [Koenig, 2002](http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf). The D* Lite algorithm was developed by Sven Koenig and Maxim Likhachev for a faster more lightweight alternative to the D* algorithm (developed by Anthony Stentz in 1995). 
 
-It's functionality has been extended to support dynamic robot and goal placement, as well as map saving and loading by Andor Siegers.
+It's functionality has been extended to support dynamic robot and goal placement, as well as map saving and loading.
 
 ## Dependencies
 * pip install pygame
