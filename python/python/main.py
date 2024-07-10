@@ -94,6 +94,9 @@ if __name__ == '__main__':
             # d star
             path, g, rhs = dstar.move_and_replan(robot_position=new_position)
 
+            # altered path
+            # new_path = plan_altered_path(path, gui.world, gui.current, gui.goal)
+
         if new_goal != old_goal:
             old_goal = new_goal
             start = gui.current

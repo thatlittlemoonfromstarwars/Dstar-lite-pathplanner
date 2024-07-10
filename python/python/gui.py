@@ -5,11 +5,12 @@ import datetime
 
 # Define some colors
 BLACK = (0, 0, 0)  # BLACK
-UNOCCUPIED = (255, 255, 255)  # WHITE
+UNOCCUPIED = (255, 255, 255)  # WHITE EDF2F4
+# UNOCCUPIED = (141, 153, 174) # 8D99AE
 GOAL = (0, 255, 0)  # GREEN
-START = (255, 0, 0)  # RED
+START = (217, 4, 41)  # RED D90429
 GRAY1 = (145, 145, 102)  # GRAY1
-OBSTACLE = (77, 77, 51)  # GRAY2
+OBSTACLE = (59, 44, 53)  # GRAY2 3B2C35
 LOCAL_GRID = (0, 0, 80)  # BLUE
 
 FILE_SAVE_PATH = 'Dstar-lite-pathplanner/maps/'
