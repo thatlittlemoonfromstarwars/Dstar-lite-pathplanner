@@ -25,7 +25,7 @@ if __name__ == '__main__':
     y_dim = 150
     start = (10, 10)
     goal = (60, 90)
-    view_range = 10
+    view_range = 50
 
     gui = Animation(title="D* Lite Path Planning",
                     width=10,
@@ -70,8 +70,8 @@ if __name__ == '__main__':
     path, g, rhs = dstar.move_and_replan(robot_position=new_position)
 
     # post process path
-    path_adjusted = plan_adjusted_path(path, gui.world, gui.current, gui.goal)
-
+    path_adjusted, gui.inflated_world.occupancy_grid_map = plan_adjusted_path(path, new_map.get_map(), gui.current, gui.goal)
+    
     while not gui.done:
         # update the map
         # drive gui
@@ -99,7 +99,7 @@ if __name__ == '__main__':
             path, g, rhs = dstar.move_and_replan(robot_position=new_position) # path holds the list of coordinates in the path
 
             # altered path
-            path_adjusted = plan_adjusted_path(path, gui.world, gui.current, gui.goal)
+            path_adjusted, gui.inflated_world.occupancy_grid_map = plan_adjusted_path(path, new_map.get_map(), gui.current, gui.goal)
 
         if new_goal != old_goal:
             old_goal = new_goal
@@ -124,4 +124,4 @@ if __name__ == '__main__':
             path, g, rhs = dstar.move_and_replan(robot_position=gui.current)
 
             # post process path
-            path_adjusted = plan_adjusted_path(path, gui.world, gui.current, gui.goal)
+            path_adjusted, gui.inflated_world.occupancy_grid_map = plan_adjusted_path(path, new_map.get_map(), gui.current, gui.goal)

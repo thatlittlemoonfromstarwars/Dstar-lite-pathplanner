@@ -20,7 +20,8 @@ GRAY1 = (145, 145, 102)  # GRAY1
 OBSTACLE = (59, 44, 53)  # GRAY2 3B2C35
 LOCAL_GRID = (0, 0, 80)  # BLUE
 
-FILE_SAVE_PATH = 'Dstar-lite-pathplanner/maps/'
+MAP_SAVE_PATH = 'Dstar-lite-pathplanner/maps/'
+PATH_SAVE_PATH = 'Dstar-lite-pathplanner/paths/'
 
 colors = {
     0: UNOCCUPIED,
@@ -72,6 +73,10 @@ class Animation:
         self.world = OccupancyGridMap(x_dim=x_dim,
                                       y_dim=y_dim,
                                       exploration_setting='8N')
+        
+        self.inflated_world = OccupancyGridMap(x_dim=x_dim,
+                                      y_dim=y_dim,
+                                      exploration_setting='8N')
 
         # Set title of screen
         pygame.display.set_caption(title)
@@ -120,7 +125,7 @@ class Animation:
     def save_grid_to_csv(self, matrix):
         # Get current date and time to use as file name
         time_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-        file_name = FILE_SAVE_PATH + time_string + ".csv"
+        file_name = MAP_SAVE_PATH + time_string + ".csv"
         matrix = matrix.astype(int)
 
         with open(file_name, 'w', newline='') as csvfile:
@@ -129,6 +134,18 @@ class Animation:
                 writer.writerow(row)
         
         print("Map saved.")
+
+    def save_path_to_csv(self, path):
+        # Get current date and time to use as file name
+        time_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        file_name = PATH_SAVE_PATH + time_string + ".csv"
+        
+        with open(file_name, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for row in path:
+                writer.writerow(row)
+        
+        print("Path saved.")
 
     def run_game(self, path=None, path_adjusted=None):
         if path is None:
@@ -154,14 +171,16 @@ class Animation:
                     self.done = True
 
                 # move to next path position
-                elif path_adjusted:
-                    if FOLLOW_UNCHANGED_PATH:
-                        (x, y) = path[1]
-                    else:
-                        (x, y) = path_adjusted[1]
-
+                elif path_adjusted and not FOLLOW_UNCHANGED_PATH:
+                    # follow adjusted path
+                    (x, y) = path_adjusted[1]
                     self.set_position((x, y))
 
+                else:
+                    # follow original path
+                    (x, y) = path[1]
+                    self.set_position((x, y))
+                
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
                 print("backspace automates the press space")
                 if not self.cont:
@@ -171,6 +190,9 @@ class Animation:
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 self.save_grid_to_csv(self.world.get_map())
+
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                self.save_path_to_csv(path)
 
             # set new start by shift-clicking
             elif pygame.mouse.get_pressed()[0] and pygame.key.get_mods() & pygame.KMOD_SHIFT:
@@ -214,7 +236,6 @@ class Animation:
                 # turn pos into cell
                 grid_cell = (x, y)
 
-
                 # set the location in the grid map
                 if self.world.is_unoccupied(grid_cell):
                     self.world.set_obstacle(grid_cell)
@@ -234,7 +255,6 @@ class Animation:
 
                 # set the location in the grid map
                 if not self.world.is_unoccupied(grid_cell):
-                    print("grid cell: ".format(grid_cell))
                     self.world.remove_obstacle(grid_cell)
                     self.observation = {"pos": grid_cell, "type": UNOCCUPIED}
 
@@ -244,8 +264,12 @@ class Animation:
         # draw the grid
         for row in range(self.x_dim):
             for column in range(self.y_dim):
+                if self.world.occupancy_grid_map[row][column] == 0 and self.inflated_world.occupancy_grid_map[row][column] == 255:
+                    color = GRAY1
+                else:
+                    color = colors[self.world.occupancy_grid_map[row][column]]
                 # color the cells
-                pygame.draw.rect(self.screen, colors[self.world.occupancy_grid_map[row][column]],
+                pygame.draw.rect(self.screen, color,
                                  [(self.margin + self.width) * column + self.margin,
                                   (self.margin + self.height) * row + self.margin,
                                   self.width,
