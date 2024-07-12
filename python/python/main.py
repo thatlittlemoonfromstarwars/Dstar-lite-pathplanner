@@ -1,7 +1,7 @@
 from gui import Animation
 from d_star_lite import DStarLite
 from grid import OccupancyGridMap, SLAM
-from post_process_path import plan_adjusted_path
+from post_process_path import plan_adjusted_path, inflate_map
 import csv
 import numpy as np
 
@@ -69,9 +69,12 @@ if __name__ == '__main__':
     # move and compute path
     path, g, rhs = dstar.move_and_replan(robot_position=new_position)
 
+    # inflate map
+    gui.inflated_world.occupancy_grid_map = inflate_map(new_map.get_map())
+    
     # post process path
     path_adjusted, gui.inflated_world.occupancy_grid_map = plan_adjusted_path(path, new_map.get_map(), gui.current, gui.goal)
-    
+
     while not gui.done:
         # update the map
         # drive gui
@@ -98,7 +101,10 @@ if __name__ == '__main__':
             # d star
             path, g, rhs = dstar.move_and_replan(robot_position=new_position) # path holds the list of coordinates in the path
 
-            # altered path
+            # inflate map
+            gui.inflated_world.occupancy_grid_map = inflate_map(new_map.get_map())
+
+            # post process path
             path_adjusted, gui.inflated_world.occupancy_grid_map = plan_adjusted_path(path, new_map.get_map(), gui.current, gui.goal)
 
         if new_goal != old_goal:
@@ -122,6 +128,9 @@ if __name__ == '__main__':
 
             # move and compute path
             path, g, rhs = dstar.move_and_replan(robot_position=gui.current)
+
+            # inflate map
+            gui.inflated_world.occupancy_grid_map = inflate_map(new_map.get_map())
 
             # post process path
             path_adjusted, gui.inflated_world.occupancy_grid_map = plan_adjusted_path(path, new_map.get_map(), gui.current, gui.goal)

@@ -4,8 +4,7 @@ from copy import deepcopy
 from d_star_lite import DStarLite
 import math
 
-# processing function
-def plan_adjusted_path(path, world_map, robot_pos, goal_pos, inflation_rad=4):
+def plan_adjusted_path(path, world_map, robot_pos, goal_pos):
     '''
     Inputs:
     path - list of (x,y) coordinates - path planned by unaltered D* Lite algorithm
@@ -29,6 +28,15 @@ def plan_adjusted_path(path, world_map, robot_pos, goal_pos, inflation_rad=4):
     '''
 
     altered_path = [] # list of coordinates representing the new path
+
+    ############################################### Modify Path Here ####################################################
+
+    #####################################################################################################################
+
+    return altered_path
+
+# processing function
+def inflate_map(world_map, inflation_rad=4):
 
     height = len(world_map)
     width = len(world_map[0])
@@ -69,8 +77,4 @@ def plan_adjusted_path(path, world_map, robot_pos, goal_pos, inflation_rad=4):
                 else:
                     # draw circle around grid space
                     draw_filled_circle(row, col)
-
-    #####################################################################################################################
-    
-    # TODO run D* lite again
-    return altered_path, new_map
+    return new_map
