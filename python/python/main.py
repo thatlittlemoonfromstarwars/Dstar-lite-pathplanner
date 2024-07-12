@@ -8,7 +8,7 @@ import numpy as np
 OBSTACLE = 255
 UNOCCUPIED = 0
 
-LOAD_FILE_PATH = 'Dstar-lite-pathplanner/maps/lab_filled_in.csv'
+LOAD_FILE_PATH = 'maps/lab_filled_in.csv' 
 # LOAD_FILE_PATH = None
 
 if __name__ == '__main__':

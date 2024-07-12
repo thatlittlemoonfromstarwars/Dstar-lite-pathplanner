@@ -7,7 +7,7 @@ from post_process_path import inflate_map
 
 # Constants
 DISPLAY_UNCHANGED_PATH = True
-FOLLOW_UNCHANGED_PATH = True
+FOLLOW_UNCHANGED_PATH = False
 
 # Define some colors
 BLACK = (0, 0, 0)  # BLACK

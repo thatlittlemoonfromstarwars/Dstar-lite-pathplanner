@@ -40,7 +40,7 @@ def plan_adjusted_path(path, world_map, robot_pos, goal_pos):
     return altered_path
 
 # processing function
-def inflate_map(world_map, inflation_rad=4):
+def inflate_map(world_map, inflation_rad=3):
 
     height = len(world_map)
     width = len(world_map[0])
