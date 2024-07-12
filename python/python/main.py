@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
             dstar_adj = DStarLite(map=new_map_inflated,
                           s_start=start,
-                          s_goal=goal)
+                          s_goal=new_goal)
             
 
             # SLAM to detect vertices

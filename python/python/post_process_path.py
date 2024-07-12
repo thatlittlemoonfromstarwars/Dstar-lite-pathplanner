@@ -31,6 +31,10 @@ def plan_adjusted_path(path, world_map, robot_pos, goal_pos):
 
     ############################################### Modify Path Here ####################################################
 
+    # Idea:
+    # Compare curvatures of path and inflated path. Use regular path if its curvature is above minimum radius, but use
+    # inflated path if not.
+
     #####################################################################################################################
 
     return altered_path
@@ -71,7 +75,7 @@ def inflate_map(world_map, inflation_rad=4):
 
                 # if straight line exists in local map move on
                 if np.all(local_map[1, :] == 1) or np.all(local_map[:, 1] == 1):
-                    continue
+                    new_map[row][col] = 255
 
                 # TODO check if grid is near edge
                 else:
