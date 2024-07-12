@@ -3,6 +3,7 @@ import pygame
 from grid import OccupancyGridMap
 import csv
 import datetime
+from post_process_path import inflate_map
 
 # Constants
 DISPLAY_UNCHANGED_PATH = True
@@ -240,6 +241,7 @@ class Animation:
                 if self.world.is_unoccupied(grid_cell):
                     self.world.set_obstacle(grid_cell)
                     self.observation = {"pos": grid_cell, "type": OBSTACLE}
+                    self.inflated_world.set_map(inflate_map(self.world.get_map()))
 
             # remove obstacle by holding right-click
             elif pygame.mouse.get_pressed()[2]:
@@ -257,6 +259,7 @@ class Animation:
                 if not self.world.is_unoccupied(grid_cell):
                     self.world.remove_obstacle(grid_cell)
                     self.observation = {"pos": grid_cell, "type": UNOCCUPIED}
+                    self.inflated_world.set_map(inflate_map(self.world.get_map()))
 
         # set the screen background
         self.screen.fill(BLACK)
