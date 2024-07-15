@@ -4,6 +4,8 @@ from copy import deepcopy
 from d_star_lite import DStarLite
 import math
 
+INFLATION_RAD = 3
+
 def plan_adjusted_path(path, world_map, robot_pos, goal_pos):
     '''
     Inputs:
@@ -40,7 +42,7 @@ def plan_adjusted_path(path, world_map, robot_pos, goal_pos):
     return altered_path
 
 # processing function
-def inflate_map(world_map, inflation_rad=3):
+def inflate_map(world_map, inflation_rad=INFLATION_RAD):
 
     height = len(world_map)
     width = len(world_map[0])
@@ -73,9 +75,23 @@ def inflate_map(world_map, inflation_rad=3):
                         elif world_map[row + i][col + j] == 255:
                             local_map[i+1][j+1] = 1
 
-                # if straight line exists in local map move on
-                if np.all(local_map[1, :] == 1) or np.all(local_map[:, 1] == 1):
+                # Check if straight line in local map ex:
+                # 0, 1, 0   0, 0, 0     1, 0, 0   0, 0, 1
+                # 0, 1, 0   1, 1, 1     0, 1, 0   0, 1, 0
+                # 0, 1, 0   0, 0, 0     0, 0, 1   1, 0, 0
+                if (np.all(local_map[1, :] == 1) or np.all(local_map[:, 1] == 1) or
+                np.all(np.diag(local_map) == 1) or np.all(np.diag(np.fliplr(local_map)) == 1)):
                     new_map[row][col] = 255
+
+                # Check if shallow diagonal line in local map ex:
+                # 0, 0, 0   0, 1, 0
+                # 1, 1, 0   0, 1, 0
+                # 0, 0, 1   1, 0, 0
+                elif ((local_map[1][0] == 1 and (local_map[0][2] == 1 or local_map[2][2] == 1)) or
+                      (local_map[0][1] == 1 and (local_map[2][0] == 1 or local_map[2][2] == 1)) or
+                      (local_map[1][2] == 1 and (local_map[0][0] == 1 or local_map[2][0] == 1)) or
+                      (local_map[2][1] == 1 and (local_map[0][0] == 1 or local_map[0][2] == 1))):
+                    new_map[row][col] == 255
 
                 # TODO check if grid is near edge
                 else:
