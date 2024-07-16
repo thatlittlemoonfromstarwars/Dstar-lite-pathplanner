@@ -123,7 +123,7 @@ def draw_points_on_circle(circle, point1, point2, point3, density):
         # Generate points along the arc between angle_start and angle_end
         return [(center[0] + radius * math.cos(angle_start + i * (angle_end - angle_start) / num_points),
                  center[1] + radius * math.sin(angle_start + i * (angle_end - angle_start) / num_points))
-                for i in range(num_points)]
+                for i in range(num_points + 1)]
     
     # Calculate angles for the three points relative to the center
     angle1 = angle_from_center(center, point1)
@@ -155,16 +155,16 @@ def draw_points_on_circle(circle, point1, point2, point3, density):
 
     return points
 
-def adjust_path_for_turn_radius(input_path, min_turn_radius):
-    og_path = copy.deepcopy(input_path)
+def adjust_path_for_turn_radius(input_path, min_turn_radius): # TODO
+    path = copy.deepcopy(input_path)
 
-    altered_path = [og_path[0]]
+    altered_path = [path[0]]
     circles = []
     last_ind = 0
-    for i in range(1, len(og_path) - 1):
-        p1 = og_path[i - 1]
-        p2 = og_path[i]
-        p3 = og_path[i + 1]
+    for i in range(1, len(path) - 1):
+        p1 = path[i - 1]
+        p2 = path[i]
+        p3 = path[i + 1]
 
         angle = angle_between_points(p1, p2, p3)
         if angle != 0 and angle < np.pi / 2:  # Detect sharp turns
@@ -176,7 +176,7 @@ def adjust_path_for_turn_radius(input_path, min_turn_radius):
                 print("Drawing arc from point: " + str(len(altered_path) - 1))
                 # find new points along circle to connect p1 to p3
                 new_points = draw_points_on_circle(temp_circle, p1, p3, p2, ARC_DENSITY)
-                og_path[i] = new_points[-1]
+                path[i] = new_points[-1]
 
                 altered_path.extend(new_points)
             else:
@@ -193,7 +193,7 @@ def adjust_path_for_turn_radius(input_path, min_turn_radius):
                 i += 1
         last_ind = i - 1
 
-    altered_path.append(og_path[-1])
+    altered_path.append(path[-1])
 
     return altered_path, circles
 
