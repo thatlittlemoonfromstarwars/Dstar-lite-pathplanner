@@ -1,18 +1,17 @@
 from gui import Animation
 from d_star_lite import DStarLite
 from grid import OccupancyGridMap, SLAM
-from post_process_path import plan_adjusted_path, inflate_map
+from post_process_path import plan_adjusted_path
 import csv
 import numpy as np
 
 OBSTACLE = 255
 UNOCCUPIED = 0
 
-LOAD_FILE_PATH = 'Dstar-lite-pathplanner/maps/lab_filled_in.csv' 
+LOAD_FILE_PATH = 'maps/lab_filled_in.csv'
 # LOAD_FILE_PATH = None
 
 if __name__ == '__main__':
-
     """
     set initial values for the map occupancy grid
     |----------> y, column
@@ -25,7 +24,7 @@ if __name__ == '__main__':
     y_dim = 150
     start = (10, 10)
     goal = (60, 90)
-    view_range = 50
+    view_range = 1000
 
     gui = Animation(title="D* Lite Path Planning",
                     width=10,
@@ -54,68 +53,52 @@ if __name__ == '__main__':
     new_map = gui.world
     old_map = new_map
 
-    new_map_inflated = gui.inflated_world
-    old_map_inflated = new_map_inflated
-
-    # inflate map
-    gui.inflated_world.occupancy_grid_map = inflate_map(new_map.get_map())
-
     new_position = start
     last_position = start
 
     # D* Lite (optimized)
-    dstar = DStarLite(map=new_map,
-                      s_start=start,
-                      s_goal=goal)
+    dstar = DStarLite(map=new_map, s_start=start, s_goal=goal)
 
-    dstar_adj = DStarLite(map=new_map_inflated,
-                          s_start=start,
-                          s_goal=goal)
-    
     # SLAM to detect vertices
-    slam = SLAM(map=new_map,
-                view_range=view_range)
-    
-    slam_adj = SLAM(map=new_map_inflated,
-                    view_range=view_range)
+    slam = SLAM(map=new_map, view_range=view_range)
 
     # move and compute path
     path, g, rhs = dstar.move_and_replan(robot_position=new_position)
-    path_adj, g_adj, rhs_adj = dstar_adj.move_and_replan(robot_position=new_position)
+
+    path_adj = plan_adjusted_path(path, new_map.occupancy_grid_map,
+                                  new_position, new_goal)
 
     while not gui.done:
         # update the map
         # drive gui
         gui.run_game(path=path, path_adjusted=path_adj)
 
-        new_position = gui.current # contains robot location
+        new_position = gui.current  # contains robot location
         new_observation = gui.observation
-        new_map = gui.world # contains map matrix (255 for obstacle, 0 for free space)
-        new_map_inflated = gui.inflated_world
-        new_goal = gui.goal # contains goal location
+        new_map = gui.world  # contains map matrix (255 for obstacle, 0 for free space)
+        new_goal = gui.goal  # contains goal location
 
         if new_observation is not None:
             old_map = new_map
-            old_map_inflated = new_map_inflated
             slam.set_ground_truth_map(gt_map=new_map)
-            slam_adj.set_ground_truth_map(gt_map=new_map_inflated)
 
         if new_position != last_position:
             last_position = new_position
 
             # slam
-            new_edges_and_old_costs, slam_map = slam.rescan(global_position=new_position)
-            new_edges_and_old_costs_adj, slam_map_adj = slam_adj.rescan(global_position=new_position)
+            new_edges_and_old_costs, slam_map = slam.rescan(
+                global_position=new_position)
 
             dstar.new_edges_and_old_costs = new_edges_and_old_costs
             dstar.sensed_map = slam_map
 
-            dstar_adj.new_edges_and_old_costs = new_edges_and_old_costs_adj
-            dstar_adj.sensed_map = slam_map_adj
-
             # d star
-            path, g, rhs = dstar.move_and_replan(robot_position=new_position) # path holds the list of coordinates in the path
-            path_adj, g_adj, rhs_adj = dstar_adj.move_and_replan(robot_position=new_position)
+            path, g, rhs = dstar.move_and_replan(
+                robot_position=new_position
+            )  # path holds the list of coordinates in the path
+
+            path_adj = plan_adjusted_path(path, new_map.occupancy_grid_map,
+                                          new_position, new_goal)
 
         if new_goal != old_goal:
             old_goal = new_goal
@@ -124,29 +107,17 @@ if __name__ == '__main__':
             new_map = gui.world
             old_map = new_map
 
-            new_map_inflated = gui.inflated_world
-            old_map_inflated = new_map_inflated
-
             new_position = start
             last_position = start
 
             # D* Lite (optimized)
-            dstar = DStarLite(map=new_map,
-                            s_start=start,
-                            s_goal=new_goal)
-
-            dstar_adj = DStarLite(map=new_map_inflated,
-                          s_start=start,
-                          s_goal=new_goal)
-            
+            dstar = DStarLite(map=new_map, s_start=start, s_goal=new_goal)
 
             # SLAM to detect vertices
-            slam = SLAM(map=new_map,
-                        view_range=view_range)
-            
-            slam_adj = SLAM(map=new_map_inflated,
-                    view_range=view_range)
-            
+            slam = SLAM(map=new_map, view_range=view_range)
+
             # move and compute path
             path, g, rhs = dstar.move_and_replan(robot_position=gui.current)
-            path_adj, g_adj, rhs_adj = dstar_adj.move_and_replan(robot_position=new_position)
+
+            path_adj = plan_adjusted_path(path, new_map.occupancy_grid_map,
+                                          new_position, new_goal)

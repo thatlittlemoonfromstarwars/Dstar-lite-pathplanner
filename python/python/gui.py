@@ -1,13 +1,11 @@
-from numpy import empty
 import pygame
 from grid import OccupancyGridMap
 import csv
 import datetime
-from post_process_path import inflate_map
 
 # Constants
 DISPLAY_UNCHANGED_PATH = True
-FOLLOW_UNCHANGED_PATH = False
+FOLLOW_UNCHANGED_PATH = True
 
 # Define some colors
 BLACK = (0, 0, 0)  # BLACK
@@ -16,7 +14,7 @@ GOAL = (0, 255, 0)  # GREEN
 ROBOT = BLACK
 # PATH = (8, 126, 139) # TEAL 087E8B
 PATH = (217, 4, 41)  # FIRE ENGINE RED D90429
-PATH_ADJUSTED = (141, 0, 23) # CARMINE 8D0017
+PATH_ADJUSTED = (141, 0, 23)  # CARMINE 8D0017
 GRAY1 = (145, 145, 102)  # GRAY1
 OBSTACLE = (59, 44, 53)  # GRAY2 3B2C35
 LOCAL_GRID = (0, 0, 80)  # BLUE
@@ -24,14 +22,11 @@ LOCAL_GRID = (0, 0, 80)  # BLUE
 MAP_SAVE_PATH = 'Dstar-lite-pathplanner/maps/'
 PATH_SAVE_PATH = 'Dstar-lite-pathplanner/paths/'
 
-colors = {
-    0: UNOCCUPIED,
-    1: GOAL,
-    255: OBSTACLE
-}
+colors = {0: UNOCCUPIED, 1: GOAL, 255: OBSTACLE}
 
 
 class Animation:
+
     def __init__(self,
                  title="D* Lite Path Planning",
                  width=10,
@@ -74,10 +69,6 @@ class Animation:
         self.world = OccupancyGridMap(x_dim=x_dim,
                                       y_dim=y_dim,
                                       exploration_setting='8N')
-        
-        self.inflated_world = OccupancyGridMap(x_dim=x_dim,
-                                      y_dim=y_dim,
-                                      exploration_setting='8N')
 
         # Set title of screen
         pygame.display.set_caption(title)
@@ -110,19 +101,28 @@ class Animation:
         if path is not None:
             for step in path:
                 # draw a moving robot, based on current coordinates
-                step_center = [round(step[1] * (self.width + self.margin) + self.width / 2) + self.margin,
-                               round(step[0] * (self.height + self.margin) + self.height / 2) + self.margin]
+                step_center = [
+                    round(step[1] *
+                          (self.width + self.margin) + self.width / 2) +
+                    self.margin,
+                    round(step[0] *
+                          (self.height + self.margin) + self.height / 2) +
+                    self.margin
+                ]
 
                 # draw robot position as red circle
-                pygame.draw.circle(self.screen, colour, step_center, round(self.width / 2) - 2)
+                pygame.draw.circle(self.screen, colour, step_center,
+                                   round(self.width / 2) - 2)
 
     def display_obs(self, observations=None):
         if observations is not None:
             for o in observations:
-                pygame.draw.rect(self.screen, GRAY1, [(self.margin + self.width) * o[1] + self.margin,
-                                                      (self.margin + self.height) * o[0] + self.margin,
-                                                      self.width,
-                                                      self.height])
+                pygame.draw.rect(
+                    self.screen, GRAY1,
+                    [(self.margin + self.width) * o[1] + self.margin,
+                     (self.margin + self.height) * o[0] + self.margin,
+                     self.width, self.height])
+
     def save_grid_to_csv(self, matrix):
         # Get current date and time to use as file name
         time_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -133,19 +133,19 @@ class Animation:
             writer = csv.writer(csvfile)
             for row in matrix:
                 writer.writerow(row)
-        
+
         print("Map saved.")
 
     def save_path_to_csv(self, path):
         # Get current date and time to use as file name
         time_string = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
         file_name = PATH_SAVE_PATH + time_string + ".csv"
-        
+
         with open(file_name, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             for row in path:
                 writer.writerow(row)
-        
+
         print("Path saved.")
 
     def run_game(self, path=None, path_adjusted=None):
@@ -163,7 +163,8 @@ class Animation:
                 print("quit")
                 self.done = True  # flag that we are done so we can exit loop
 
-            elif (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or self.cont:
+            elif (event.type == pygame.KEYDOWN
+                  and event.key == pygame.K_SPACE) or self.cont:
                 # space bar pressed. call next action
 
                 # check if at goal
@@ -181,7 +182,7 @@ class Animation:
                     # follow original path
                     (x, y) = path[1]
                     self.set_position((x, y))
-                
+
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
                 print("backspace automates the press space")
                 if not self.cont:
@@ -196,7 +197,8 @@ class Animation:
                 self.save_path_to_csv(path)
 
             # set new start by shift-clicking
-            elif pygame.mouse.get_pressed()[0] and pygame.key.get_mods() & pygame.KMOD_SHIFT:
+            elif pygame.mouse.get_pressed(
+            )[0] and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # User clicks the mouse. Get the position
                 (col, row) = pygame.mouse.get_pos()
 
@@ -206,12 +208,13 @@ class Animation:
 
                 # turn pos into cell
                 grid_cell = (x, y)
-                
+
                 # change start position
                 self.current = grid_cell
 
             # set new goal by ctrl-clicking
-            elif pygame.mouse.get_pressed()[0] and pygame.key.get_mods() & pygame.KMOD_CTRL:
+            elif pygame.mouse.get_pressed(
+            )[0] and pygame.key.get_mods() & pygame.KMOD_CTRL:
                 # User clicks the mouse. Get the position
                 (col, row) = pygame.mouse.get_pos()
 
@@ -221,7 +224,7 @@ class Animation:
 
                 # turn pos into cell
                 grid_cell = (x, y)
-                
+
                 # change start position
                 self.goal = grid_cell
 
@@ -241,7 +244,6 @@ class Animation:
                 if self.world.is_unoccupied(grid_cell):
                     self.world.set_obstacle(grid_cell)
                     self.observation = {"pos": grid_cell, "type": OBSTACLE}
-                    self.inflated_world.set_map(inflate_map(self.world.get_map()))
 
             # remove obstacle by holding right-click
             elif pygame.mouse.get_pressed()[2]:
@@ -259,7 +261,6 @@ class Animation:
                 if not self.world.is_unoccupied(grid_cell):
                     self.world.remove_obstacle(grid_cell)
                     self.observation = {"pos": grid_cell, "type": UNOCCUPIED}
-                    self.inflated_world.set_map(inflate_map(self.world.get_map()))
 
         # set the screen background
         self.screen.fill(BLACK)
@@ -267,16 +268,13 @@ class Animation:
         # draw the grid
         for row in range(self.x_dim):
             for column in range(self.y_dim):
-                if self.world.occupancy_grid_map[row][column] == 0 and self.inflated_world.occupancy_grid_map[row][column] == 255:
-                    color = GRAY1
-                else:
-                    color = colors[self.world.occupancy_grid_map[row][column]]
+                color = colors[self.world.occupancy_grid_map[row][column]]
                 # color the cells
-                pygame.draw.rect(self.screen, color,
-                                 [(self.margin + self.width) * column + self.margin,
-                                  (self.margin + self.height) * row + self.margin,
-                                  self.width,
-                                  self.height])
+                pygame.draw.rect(
+                    self.screen, color,
+                    [(self.margin + self.width) * column + self.margin,
+                     (self.margin + self.height) * row + self.margin,
+                     self.width, self.height])
 
         # display both path and adjusted path
         if DISPLAY_UNCHANGED_PATH:
@@ -284,25 +282,32 @@ class Animation:
         self.display_path(path=path_adjusted, colour=PATH_ADJUSTED)
 
         # fill in the goal cell with green
-        pygame.draw.rect(self.screen, GOAL, [(self.margin + self.width) * self.goal[1] + self.margin,
-                                             (self.margin + self.height) * self.goal[0] + self.margin,
-                                             self.width,
-                                             self.height])
+        pygame.draw.rect(
+            self.screen, GOAL,
+            [(self.margin + self.width) * self.goal[1] + self.margin,
+             (self.margin + self.height) * self.goal[0] + self.margin,
+             self.width, self.height])
 
         # draw a moving robot, based on current coordinates
-        robot_center = [round(self.current[1] * (self.width + self.margin) + self.width / 2) + self.margin,
-                        round(
-                            self.current[0] * (self.height + self.margin) + self.height / 2) + self.margin]
+        robot_center = [
+            round(self.current[1] *
+                  (self.width + self.margin) + self.width / 2) + self.margin,
+            round(self.current[0] *
+                  (self.height + self.margin) + self.height / 2) + self.margin
+        ]
 
         # draw robot position as red circle
-        pygame.draw.circle(self.screen, ROBOT, robot_center, round(self.width / 2) - 2)
+        pygame.draw.circle(self.screen, ROBOT, robot_center,
+                           round(self.width / 2) - 2)
 
         # draw robot local grid map (viewing range)
-        pygame.draw.rect(self.screen, LOCAL_GRID,
-                         [robot_center[0] - self.viewing_range * (self.height + self.margin),
-                          robot_center[1] - self.viewing_range * (self.width + self.margin),
-                          2 * self.viewing_range * (self.height + self.margin),
-                          2 * self.viewing_range * (self.width + self.margin)], 2)
+        pygame.draw.rect(self.screen, LOCAL_GRID, [
+            robot_center[0] - self.viewing_range *
+            (self.height + self.margin), robot_center[1] - self.viewing_range *
+            (self.width + self.margin), 2 * self.viewing_range *
+            (self.height + self.margin), 2 * self.viewing_range *
+            (self.width + self.margin)
+        ], 2)
 
         # set game tick
         self.clock.tick(20)
